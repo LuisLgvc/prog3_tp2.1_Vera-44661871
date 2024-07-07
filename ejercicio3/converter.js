@@ -62,6 +62,23 @@ class CurrencyConverter {
 
         return todayRate - yesterdayRate;
     }
+
+    getCurrentDateFormatted() {
+        const date = new Date();
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    getYesterdayDateFormatted() {
+        const date = new Date();
+        date.setDate(date.getDate() - 1);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -97,6 +114,13 @@ document.addEventListener("DOMContentLoaded", async () => {
             resultDiv.textContent = `${amount} ${
                 fromCurrency.code
             } son ${convertedAmount.toFixed(2)} ${toCurrency.code}`;
+
+            const rateDifference = await converter.compareRates(fromCurrency, toCurrency);
+            if (rateDifference !== null) {
+                resultDiv.textContent += `\n - La diferencia en la tasa de cambio entre hoy y ayer es: ${rateDifference.toFixed(4)}`;
+            } else {
+                resultDiv.textContent += `\n - No se pudo obtener la diferencia en la tasa de cambio.`;
+            }
         } else {
             resultDiv.textContent = "Error al realizar la conversión.";
         }
