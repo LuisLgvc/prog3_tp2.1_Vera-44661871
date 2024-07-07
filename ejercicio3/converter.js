@@ -22,10 +22,11 @@ class CurrencyConverter {
     }
 
     async convertCurrency(amount, fromCurrency, toCurrency) {
-        if (fromCurrency.code === toCurrency.code) {
-            return amount;
-        }
         try {
+            if (fromCurrency.code === toCurrency.code) {
+                return +amount; // Convert amount to number if it's a string
+            }
+            
             const response = await fetch(`${this.apiUrl}/latest?amount=${amount}&from=${fromCurrency.code}&to=${toCurrency.code}`);
             const data = await response.json();
             return data.rates[toCurrency.code];
@@ -36,10 +37,11 @@ class CurrencyConverter {
     }
 
     async getHistoricalRate(date, fromCurrency, toCurrency) {
-        if (fromCurrency.code === toCurrency.code) {
-            return 1;
-        }
         try {
+            if (fromCurrency.code === toCurrency.code) {
+                return 1;
+            }
+            
             const response = await fetch(`${this.apiUrl}/${date}?from=${fromCurrency.code}&to=${toCurrency.code}`);
             const data = await response.json();
             return data.rates[toCurrency.code];
@@ -50,17 +52,22 @@ class CurrencyConverter {
     }
 
     async compareRates(fromCurrency, toCurrency) {
-        const today = this.getCurrentDateFormatted();
-        const yesterday = this.getYesterdayDateFormatted();
+        try {
+            const today = this.getCurrentDateFormatted();
+            const yesterday = this.getYesterdayDateFormatted();
 
-        const todayRate = await this.getHistoricalRate(today, fromCurrency, toCurrency);
-        const yesterdayRate = await this.getHistoricalRate(yesterday, fromCurrency, toCurrency);
+            const todayRate = await this.getHistoricalRate(today, fromCurrency, toCurrency);
+            const yesterdayRate = await this.getHistoricalRate(yesterday, fromCurrency, toCurrency);
 
-        if (todayRate === null || yesterdayRate === null) {
+            if (todayRate === null || yesterdayRate === null) {
+                return null;
+            }
+
+            return todayRate - yesterdayRate;
+        } catch (error) {
+            console.error("Error comparando las tasas de cambio:", error);
             return null;
         }
-
-        return todayRate - yesterdayRate;
     }
 
     getCurrentDateFormatted() {
@@ -115,11 +122,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 fromCurrency.code
             } son ${convertedAmount.toFixed(2)} ${toCurrency.code}`;
 
-            const rateDifference = await converter.compareRates(fromCurrency, toCurrency);
-            if (rateDifference !== null) {
-                resultDiv.textContent += `\n - La diferencia en la tasa de cambio entre hoy y ayer es: ${rateDifference.toFixed(4)}`;
-            } else {
-                resultDiv.textContent += `\n - No se pudo obtener la diferencia en la tasa de cambio.`;
+            if (fromCurrency.code !== toCurrency.code) {
+                const rateDifference = await converter.compareRates(fromCurrency, toCurrency);
+                if (rateDifference !== null) {
+                    resultDiv.textContent += `\n - La diferencia en la tasa de cambio entre hoy y ayer es: ${rateDifference.toFixed(4)}`;
+                } else {
+                    resultDiv.textContent += `\n - No se pudo obtener la diferencia en la tasa de cambio.`;
+                }
             }
         } else {
             resultDiv.textContent = "Error al realizar la conversión.";
