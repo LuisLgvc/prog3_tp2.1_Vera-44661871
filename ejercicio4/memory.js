@@ -115,26 +115,62 @@ class MemoryGame {
         this.board = board;
         this.flippedCards = [];
         this.matchedCards = [];
+        this.moves = 0;
+
         if (flipDuration < 350 || isNaN(flipDuration) || flipDuration > 3000) {
             flipDuration = 350;
-            alert(
-                "La duración de la animación debe estar entre 350 y 3000 ms, se ha establecido a 350 ms"
-            );
+            alert("La duración de la animación debe estar entre 350 y 3000 ms, se ha establecido a 350 ms");
         }
         this.flipDuration = flipDuration;
         this.board.onCardClick = this.#handleCardClick.bind(this);
         this.board.reset();
+
+        this.#initializeUI();
     }
 
-    #handleCardClick(card) {
+    #initializeUI() {
+        const movesElement = document.createElement("div");
+        movesElement.id = "moves";
+        movesElement.textContent = "Movimientos: 0";
+        document.body.insertBefore(movesElement, document.body.firstChild);
+    }
+
+    async #handleCardClick(card) {
         if (this.flippedCards.length < 2 && !card.isFlipped) {
             card.toggleFlip();
             this.flippedCards.push(card);
 
             if (this.flippedCards.length === 2) {
-                setTimeout(() => this.checkForMatch(), this.flipDuration);
+                this.moves += 1;
+                document.getElementById("moves").textContent = `Movimientos: ${this.moves}`;
+                setTimeout(() => this.#checkForMatch(), this.flipDuration);
             }
         }
+    }
+
+    #checkForMatch() {
+        const [firstCard, secondCard] = this.flippedCards;
+
+        if (firstCard.name === secondCard.name) {
+            this.matchedCards.push(firstCard, secondCard);
+        } else {
+            firstCard.toggleFlip();
+            secondCard.toggleFlip();
+        }
+
+        this.flippedCards = [];
+
+        if (this.matchedCards.length === this.board.cards.length) {
+            alert(`¡Felicidades! Has completado el juego en ${this.moves} movimientos.`);
+        }
+    }
+
+    resetGame() {
+        this.flippedCards = [];
+        this.matchedCards = [];
+        this.moves = 0;
+        document.getElementById("moves").textContent = "Movimientos: 0";
+        this.board.reset();
     }
 }
 
