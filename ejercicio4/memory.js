@@ -89,6 +89,14 @@ class Board {
         }
     }
 
+    flipDownAllCards() {
+        this.cards.forEach((card) => {
+            if (card.isFlipped) {
+                card.toggleFlip();
+            }
+        });
+    }
+
     onCardClicked(card) {
         if (this.onCardClick) {
             this.onCardClick(card);
