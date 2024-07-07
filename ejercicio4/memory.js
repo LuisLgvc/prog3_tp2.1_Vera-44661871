@@ -97,6 +97,12 @@ class Board {
         });
     }
 
+    reset() {
+        this.shuffleCards();
+        this.flipDownAllCards();
+        this.render();
+    }
+
     onCardClicked(card) {
         if (this.onCardClick) {
             this.onCardClick(card);
