@@ -31,6 +31,10 @@ class Card {
         }
     }
 
+    matches(otherCard) {
+        return this.name === otherCard.name;
+    }
+
     #flip() {
         const cardElement = this.element.querySelector(".card");
         cardElement.classList.add("flipped");
