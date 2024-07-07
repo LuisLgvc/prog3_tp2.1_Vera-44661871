@@ -11,7 +11,15 @@ class CurrencyConverter {
         this.currencies = [];
     }
 
-    getCurrencies(apiUrl) {}
+    async getCurrencies() {
+        try {
+            const response = await fetch(`${this.apiUrl}/currencies`);
+            const data = await response.json();
+            this.currencies = Object.keys(data).map(code => new Currency(code, data[code]));
+        } catch (error) {
+            console.error("Error obteniendo las divisas:", error);
+        }
+    }
 
     convertCurrency(amount, fromCurrency, toCurrency) {}
 }
