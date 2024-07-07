@@ -34,6 +34,20 @@ class CurrencyConverter {
             return null;
         }
     }
+
+    async getHistoricalRate(date, fromCurrency, toCurrency) {
+        if (fromCurrency.code === toCurrency.code) {
+            return 1;
+        }
+        try {
+            const response = await fetch(`${this.apiUrl}/${date}?from=${fromCurrency.code}&to=${toCurrency.code}`);
+            const data = await response.json();
+            return data.rates[toCurrency.code];
+        } catch (error) {
+            console.error(`Error obteniendo el rango de precio en ${date}:`, error);
+            return null;
+        }
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
