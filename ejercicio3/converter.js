@@ -48,6 +48,20 @@ class CurrencyConverter {
             return null;
         }
     }
+
+    async compareRates(fromCurrency, toCurrency) {
+        const today = this.getCurrentDateFormatted();
+        const yesterday = this.getYesterdayDateFormatted();
+
+        const todayRate = await this.getHistoricalRate(today, fromCurrency, toCurrency);
+        const yesterdayRate = await this.getHistoricalRate(yesterday, fromCurrency, toCurrency);
+
+        if (todayRate === null || yesterdayRate === null) {
+            return null;
+        }
+
+        return todayRate - yesterdayRate;
+    }
 }
 
 document.addEventListener("DOMContentLoaded", async () => {
